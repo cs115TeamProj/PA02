@@ -70,7 +70,40 @@ The user moves a cube around the board trying to knock balls into a cone
 			createMainScene();
 	}
 
+	function initSuzanne(){
+		var loader = new THREE.JSONLoader();
+		loader.load("../models/suzanne.json",
+					function ( geometry, materials ) {
+						console.log("loading suzanne");
+						var material = //materials[ 0 ];
+						new THREE.MeshLambertMaterial( { color: 0x00ff00 } );
+						suzanne = new THREE.Mesh( geometry, material );
+						var suzy2 = suzanne.clone(false);
+						console.log("created suzanne mesh");
+						console.log(JSON.stringify(suzanne.scale));// = new THREE.Vector3(4.0,1.0,1.0);
+						scene.add( suzanne  );
+						var s = 0.5;
+						suzanne.scale.y=s;
+						suzanne.scale.x=s;
+						suzanne.scale.z=s;
+						suzanne.position.z = -5;
+						suzanne.position.y = 3;
+						suzanne.position.x = -5;
+						suzanne.castShadow = true;
 
+
+						suzy2.position.x = 1;
+						suzy2.position.y = 2;
+						scene.add(suzy2);
+						suzy2.castShadow = true;
+
+						//
+					},
+					function(xhr){
+						console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );},
+					function(err){console.log("error in loading: "+err);}
+				)
+	}
 	function createMainScene(){
       // setup lighting
 			var light1 = createPointLight();
