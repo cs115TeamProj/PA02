@@ -16,7 +16,7 @@ The user moves a cube around the board trying to knock balls into a cone
 	var cone;
 	var npc;
 
-	var endScene, endCamera, endText;
+	var endScene, loseScene, endCamera, loseCamera, endText;
 
 	var controls =
 	     {fwd:false, bwd:false, left:false, right:false,
@@ -24,7 +24,7 @@ The user moves a cube around the board trying to knock balls into a cone
 		    camera:camera}
 
 	var gameState =
-	     {score:0, health:10, scene:'main', camera:'none' }
+	     {score:0, health:10, scene:'youlose', camera:'none' }
 
 
 	// Here is the main game control
@@ -43,7 +43,19 @@ The user moves a cube around the board trying to knock balls into a cone
 		endCamera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 1000 );
 		endCamera.position.set(0,50,1);
 		endCamera.lookAt(0,0,0);
+	}
 
+	function createLoseScene(){
+		loseScene = initScene();
+		loseText = createSkyBox('youlose.png',10);
+		//endText.rotateX(Math.PI);
+		loseScene.add(loseText);
+		var light1 = createPointLight();
+		light1.position.set(0,200,20);
+		loseScene.add(light1);
+		loseCamera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 1000 );
+		loseCamera.position.set(0,50,1);
+		loseCamera.lookAt(0,0,0);
 	}
 
 	/**
@@ -53,6 +65,7 @@ The user moves a cube around the board trying to knock balls into a cone
       initPhysijs();
 			scene = initScene();
 			createEndScene();
+			createLoseScene();
 			initRenderer();
 			createMainScene();
 	}
@@ -70,8 +83,6 @@ The user moves a cube around the board trying to knock balls into a cone
 			camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 1000 );
 			camera.position.set(0,50,0);
 			camera.lookAt(0,0,0);
-
-
 
 			// create the ground and the skybox
 			var ground = createGround('grass.png');
@@ -337,6 +348,17 @@ The user moves a cube around the board trying to knock balls into a cone
 			return;
 		}
 
+		if(gameState.scene='youlose') {
+			if(event.key=='r') {
+				gameState.health=10;
+				gameState.score = 0;
+				gameState.scene = 'main';
+				addBalls();
+				return;
+			}
+
+		}
+
 		// this is the regular scene
 		switch (event.key){
 			// change the way the avatar is moving
@@ -449,6 +471,13 @@ The user moves a cube around the board trying to knock balls into a cone
 				}
 				break;
 
+		case "youlose":
+		console.log("losing")
+			loseTexta.rotateY(0.005);
+			renderer.render(loseScene, loseCamera );
+			break;
+
+
 			default:
 			  console.log("don't know the scene "+gameState.scene);
 
@@ -456,6 +485,5 @@ The user moves a cube around the board trying to knock balls into a cone
 
 		//draw heads up display ..
 	  var info = document.getElementById("info");
-		info.innerHTML='<div style="font-size:24pt">Score: ' + gameState.score + '</div>';
-
+		info.innerHTML='<div style="font-size:24pt">Score: ' + gameState.score + ' aHealth: ' + gameState.health + '</div>';
 	}
