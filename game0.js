@@ -20,7 +20,7 @@ The user moves a cube around the board trying to knock balls into a cone
 
 	var controls =
 	     {fwd:false, bwd:false, left:false, right:false,
-				speed:10, fly:false, reset:false,
+				speed:10, fly:false, reset:false, npcSpeed:100, npcFwd:false,
 		    camera:camera}
 
 	var gameState =
@@ -340,26 +340,26 @@ The user moves a cube around the board trying to knock balls into a cone
 		// this is the regular scene
 		switch (event.key){
 			// change the way the avatar is moving
-			case "w": controls.fwd = true;  break;
-			case "s": controls.bwd = true; break;
-			case "a": controls.left = true; break;
-			case "d": controls.right = true; break;
-			case "r": controls.up = true; break;
-			case "f": controls.down = true; break;
-			case "m": controls.speed = 30; break;
-      case " ": controls.fly = true; break;
-      case "h": controls.reset = true; break;
+			case "w": controls.fwd 		= true; break;
+			case "s": controls.bwd 		= true; break;
+			case "a": controls.left 	= true; break;
+			case "d": controls.right	= true; break;
+			case "r": controls.up 		= true; break;
+			case "f": controls.down		= true; break;
+			case "m": controls.speed 	= 30; 	break;
+      case " ": controls.fly 		= true; break;
+      case "h": controls.reset 	= true; break;
 
 
 			// switch cameras
-			case "1": gameState.camera = camera; break;
+			case "1": gameState.camera = camera; 		break;
 			case "2": gameState.camera = avatarCam; break;
 
 			// move the camera around, relative to the avatar
-			case "ArrowLeft": avatarCam.translateY(1);break;
-			case "ArrowRight": avatarCam.translateY(-1);break;
-			case "ArrowUp": avatarCam.translateZ(-1);break;
-			case "ArrowDown": avatarCam.translateZ(1);break;
+			case "ArrowLeft"	: 	avatarCam.translateY(1);	break;
+			case "ArrowRight"	: 	avatarCam.translateY(-1);	break;
+			case "ArrowUp"		: 	avatarCam.translateZ(-1);	break;
+			case "ArrowDown"	: 	avatarCam.translateZ(1);	break;
 
 		}
 
@@ -369,25 +369,28 @@ The user moves a cube around the board trying to knock balls into a cone
 		//console.log("Keydown:"+event.key);
 		//console.dir(event);
 		switch (event.key){
-			case "w": controls.fwd   = false;  break;
+			case "w": controls.fwd   = false; break;
 			case "s": controls.bwd   = false; break;
 			case "a": controls.left  = false; break;
 			case "d": controls.right = false; break;
 			case "r": controls.up    = false; break;
 			case "f": controls.down  = false; break;
-			case "m": controls.speed = 10; break;
-      case " ": controls.fly = false; break;
+			case "m": controls.speed = 10; 		break;
+      case " ": controls.fly 	 = false; break;
       case "h": controls.reset = false; break;
 		}
 	}
 
 	function updateNPC(){
 			npc.lookAt(avatar.position);
-		  //npc.__dirtyPosition = true;
-			// npc.setLinearVelocity(npc.getWorldDirection().multiplyScalar(0.5));
+
 			var distance = npc.position.distanceTo(avatar.position)
-			if(distance<=20){
-					npc.translateX(5);
+			if(distance = 20){
+				controls.npcFwd = true;
+			}
+			if (controls.npcFwd){
+				npc.__dirtyPosition = true;
+				npc.setLinearVelocity(npc.getWorldDirection().multiplyScalar(controls.npcSpeed));
 			}
 		}
 
