@@ -24,7 +24,7 @@ The user moves a cube around the board trying to knock balls into a cone
 		    camera:camera}
 
 	var gameState =
-	     {score:0, health:10, scene:'youlose', camera:'none' }
+	     {score:0, health:10, scene:'main', camera:'none' }
 
 
 	// Here is the main game control
@@ -470,7 +470,7 @@ The user moves a cube around the board trying to knock balls into a cone
 
 		case "youlose":
 		console.log("losing")
-			loseTexta.rotateY(0.005);
+			loseText.rotateY(0.005);
 			renderer.render(loseScene, loseCamera );
 			break;
 
