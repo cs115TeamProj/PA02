@@ -466,6 +466,9 @@ The user moves a cube around the board trying to knock balls into a cone
 				if (gameState.camera!= 'none'){
 					renderer.render( scene, gameState.camera );
 				}
+				// if (gameState.health == 0){
+				// 	gameState.scene = 'youlose';
+				// }
 				break;
 
 		case "youlose":
@@ -482,5 +485,5 @@ The user moves a cube around the board trying to knock balls into a cone
 
 		//draw heads up display ..
 	  var info = document.getElementById("info");
-		info.innerHTML='<div style="font-size:24pt">Score: ' + gameState.score + ' aHealth: ' + gameState.health + '</div>';
+		info.innerHTML='<div style="font-size:24pt">Score: ' + gameState.score + ' Health: ' + gameState.health + '</div>';
 	}
