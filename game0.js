@@ -11,6 +11,7 @@ The user moves a cube around the board trying to knock balls into a cone
 	var scene, renderer;  // all threejs programs need these
 	var camera, avatarCam;  // we have two cameras in the main scene
 	var avatar;
+	var suzanne;
 	// here are some mesh objects ...
 
 	var cone;
@@ -30,8 +31,34 @@ The user moves a cube around the board trying to knock balls into a cone
 	// Here is the main game control
   init(); //
 	initControls();
+	initSuzanne();
+	initSuzanneOBJ();
 	animate();  // start the animation loop!
 
+
+		function initSuzanneOBJ(){
+			var loader = new THREE.OBJLoader();
+			loader.load("../models/dogplane.obj",
+						function ( obj) {
+							console.log("loading obj file");
+							obj.scale.x=1;
+							obj.scale.y=1;
+							obj.scale.z=1;
+							obj.position.y = 2;
+							obj.position.x = -2;
+
+							//scene.add(obj);
+							obj.castShadow = true;
+
+							//
+						},
+						function(xhr){
+							console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );},
+
+						function(err){
+							console.log("error in loading: "+err);}
+					)
+		}
 	function createEndScene(){
 		endScene = initScene();
 		endText = createSkyBox('youwon.png',10);
@@ -105,7 +132,8 @@ The user moves a cube around the board trying to knock balls into a cone
 			cone.position.set(10,3,7);
 			scene.add(cone);
 
-			npc = createBoxMesh(0x0000ff,1,2,4);
+			npc = initSuzanne();
+			//npc = createBoxMesh(0x0000ff,1,2,4);
 			npc.position.set(30,3,-30);
 			scene.add(npc);
 
@@ -118,7 +146,34 @@ The user moves a cube around the board trying to knock balls into a cone
 		return Math.random()*n;
 	}
 
-
+	function initSuzanne(){
+		var loader = new THREE.JSONLoader();
+		loader.load("../models/suzanne.json",
+					function ( geometry, materials ) {
+						console.log("loading suzanne");
+						var material = //materials[ 0 ];
+						new THREE.MeshLambertMaterial( { color: 0x00ff00 } );
+						suzanne = new Physijs.BoxMesh( geometry, material );
+						console.log("created suzanne mesh");
+						console.log(JSON.stringify(suzanne.scale));// = new THREE.Vector3(4.0,1.0,1.0);
+						scene.add( suzanne  );
+						var s = 0.5;
+						suzanne.scale.y=s;
+						suzanne.scale.x=s;
+						suzanne.scale.z=s;
+						suzanne.position.z = -5;
+						suzanne.position.y = 3;
+						suzanne.position.x = -5;
+						suzanne.castShadow = true;
+						console.log(suzanne);
+					},
+					function(xhr){
+						console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );},
+					function(err){console.log("error in loading: "+err);}
+				);
+				console.log(suzanne);
+				return suzanne;
+	}
 
 
 	function addBalls(){
@@ -375,6 +430,8 @@ The user moves a cube around the board trying to knock balls into a cone
 			case "2": gameState.camera = avatarCam; break;
 
 			// move the camera around, relative to the avatar
+			case "q": avatarCam.rotateY(.05);break;
+			case "e": avatarCam.rotateY(-.05);break;
 			case "ArrowLeft"	: 	avatarCam.translateY(1);	break;
 			case "ArrowRight"	: 	avatarCam.translateY(-1);	break;
 			case "ArrowUp"		: 	avatarCam.translateZ(-1);	break;
@@ -466,9 +523,6 @@ The user moves a cube around the board trying to knock balls into a cone
 				if (gameState.camera!= 'none'){
 					renderer.render( scene, gameState.camera );
 				}
-				// if (gameState.health == 0){
-				// 	gameState.scene = 'youlose';
-				// }
 				break;
 
 		case "youlose":
@@ -485,5 +539,5 @@ The user moves a cube around the board trying to knock balls into a cone
 
 		//draw heads up display ..
 	  var info = document.getElementById("info");
-		info.innerHTML='<div style="font-size:24pt">Score: ' + gameState.score + ' Health: ' + gameState.health + '</div>';
+		info.innerHTML='<div style="font-size:24pt">Score: ' + gameState.score + ' aHealth: ' + gameState.health + '</div>';
 	}
