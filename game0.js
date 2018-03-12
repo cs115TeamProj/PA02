@@ -345,7 +345,7 @@ The user moves a cube around the board trying to knock balls into a cone
 			return;
 		}
 
-		if(gameState.scene='youlose') {
+		if(gameState.scene=='youlose') {
 			if(event.key=='r') {
 				gameState.health=10;
 				gameState.score = 0;
