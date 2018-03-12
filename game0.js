@@ -6,7 +6,6 @@ The user moves a cube around the board trying to knock balls into a cone
 
 */
 
-
 	// First we declare the variables that hold the objects we need
 	// in the animation code
 	var scene, renderer;  // all threejs programs need these
@@ -15,13 +14,9 @@ The user moves a cube around the board trying to knock balls into a cone
 	// here are some mesh objects ...
 
 	var cone;
-
+	var npc;
 
 	var endScene, endCamera, endText;
-
-
-
-
 
 	var controls =
 	     {fwd:false, bwd:false, left:false, right:false,
@@ -36,9 +31,6 @@ The user moves a cube around the board trying to knock balls into a cone
   init(); //
 	initControls();
 	animate();  // start the animation loop!
-
-
-
 
 	function createEndScene(){
 		endScene = initScene();
@@ -102,6 +94,9 @@ The user moves a cube around the board trying to knock balls into a cone
 			cone.position.set(10,3,7);
 			scene.add(cone);
 
+			npc = createBoxMesh(0x0000ff,1,2,4);
+			npc.position.set(30,3,-30);
+			scene.add(npc);
 
 			//playGameMusic();
 
@@ -220,17 +215,14 @@ The user moves a cube around the board trying to knock balls into a cone
 	}
 
 
-
-	function createBoxMesh(color){
-		var geometry = new THREE.BoxGeometry( 1, 1, 1);
-		var material = new THREE.MeshLambertMaterial( { color: color} );
-		mesh = new Physijs.BoxMesh( geometry, material );
-    //mesh = new Physijs.BoxMesh( geometry, material,0 );
-		mesh.castShadow = true;
-		return mesh;
-	}
-
-
+	function createBoxMesh(color,w,h,d){
+			var geometry = new THREE.BoxGeometry( w, h, d);
+			var material = new THREE.MeshLambertMaterial( { color: color} );
+			mesh = new Physijs.BoxMesh( geometry, material );
+			//mesh = new Physijs.BoxMesh( geometry, material,0 );
+			mesh.castShadow = true;
+			return mesh;
+		}
 
 	function createGround(image){
 		// creating a textured plane which receives shadows
@@ -389,7 +381,15 @@ The user moves a cube around the board trying to knock balls into a cone
 		}
 	}
 
-
+	function updateNPC(){
+			npc.lookAt(avatar.position);
+		  //npc.__dirtyPosition = true;
+			// npc.setLinearVelocity(npc.getWorldDirection().multiplyScalar(0.5));
+			var distance = npc.position.distanceTo(avatar.position)
+			if(distance<=20){
+					npc.translateX(5);
+			}
+		}
 
 
   function updateAvatar(){
@@ -439,6 +439,7 @@ The user moves a cube around the board trying to knock balls into a cone
 
 			case "main":
 				updateAvatar();
+				updateNPC();
 	    	scene.simulate();
 				if (gameState.camera!= 'none'){
 					renderer.render( scene, gameState.camera );
