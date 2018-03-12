@@ -20,7 +20,7 @@ The user moves a cube around the board trying to knock balls into a cone
 
 	var controls =
 	     {fwd:false, bwd:false, left:false, right:false,
-				speed:10, fly:false, reset:false, npcSpeed:100, npcFwd:false,
+				speed:10, fly:false, reset:false, npcSpeed:5, npcFwd:false,
 		    camera:camera}
 
 	var gameState =
@@ -310,9 +310,6 @@ The user moves a cube around the board trying to knock balls into a cone
 	}
 
 
-
-
-
 	var clock;
 
 	function initControls(){
@@ -385,11 +382,11 @@ The user moves a cube around the board trying to knock balls into a cone
 			npc.lookAt(avatar.position);
 
 			var distance = npc.position.distanceTo(avatar.position)
-			if(distance = 20){
+			if(distance <= 15){
 				controls.npcFwd = true;
 			}
 			if (controls.npcFwd){
-				npc.__dirtyPosition = true;
+				// npc.__dirtyPosition = true;
 				npc.setLinearVelocity(npc.getWorldDirection().multiplyScalar(controls.npcSpeed));
 			}
 		}
