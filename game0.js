@@ -17,7 +17,7 @@ The user moves a cube around the board trying to knock balls into a cone
 	var cone;
 	var npc;
 
-	var endScene, loseScene, endCamera, loseCamera, endText;
+	var endScene, loseScene, startScene, endCamera, loseCamera, startCamera, endText, startText;
 
 	var controls =
 	     {fwd:false, bwd:false, left:false, right:false,
@@ -25,7 +25,7 @@ The user moves a cube around the board trying to knock balls into a cone
 		    camera:camera}
 
 	var gameState =
-	     {score:0, health:10, scene:'main', camera:'none' }
+	     {score:0, health:10, scene:'start', camera:'none' }
 
 
 	// Here is the main game control
@@ -45,6 +45,20 @@ The user moves a cube around the board trying to knock balls into a cone
 		endCamera.position.set(0,50,1);
 		endCamera.lookAt(0,0,0);
 	}
+
+	function createStartScene() {
+		startScene = initScene();
+		startText = createSkyBox('start.png',10);
+		//endText.rotateX(Math.PI);
+		startScene.add(startText);
+		var light1 = createPointLight();
+		light1.position.set(0,200,20);
+		startScene.add(light1);
+		startCamera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 1000 );
+		startCamera.position.set(0,50,1);
+		startCamera.lookAt(0,0,0);
+	}
+
 
 	function createLoseScene(){
 		loseScene = initScene();
@@ -67,10 +81,10 @@ The user moves a cube around the board trying to knock balls into a cone
 			scene = initScene();
 			createEndScene();
 			createLoseScene();
+			createStartScene();
 			initRenderer();
 			createMainScene();
 	}
-
 
 	function createMainScene(){
       // setup lighting
@@ -355,6 +369,12 @@ The user moves a cube around the board trying to knock balls into a cone
 
 	function keydown(event){
 		console.log("Keydown:"+event.key);
+		if (gameState.scene == 'start' && event.key=='p') {
+			gameState.scene = 'main';
+			gameState.score = 0;
+			addBalls();
+			return;
+		}
 		//console.dir(event);
 		// first we handle the "play again" key in the "youwon" scene
 		if (gameState.scene == 'youwon' && event.key=='r') {
@@ -363,6 +383,7 @@ The user moves a cube around the board trying to knock balls into a cone
 			addBalls();
 			return;
 		}
+
 
 		if(gameState.scene=='youlose') {
 			if(event.key=='r') {
@@ -477,7 +498,12 @@ The user moves a cube around the board trying to knock balls into a cone
 				endText.rotateY(0.005);
 				renderer.render( endScene, endCamera );
 				break;
-
+			case "start":
+				console.log("starta")
+				loseText.rotateY(0.005);
+				console.log(startScene)
+				renderer.render(startScene, startCamera );
+				break;
 			case "main":
 				updateAvatar();
 				updateNPC();
