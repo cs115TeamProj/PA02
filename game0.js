@@ -9,7 +9,7 @@ The user moves a cube around the board trying to knock balls into a cone
 	// First we declare the variables that hold the objects we need
 	// in the animation code
 	var scene, renderer;  // all threejs programs need these
-	var camera, avatarCam;  // we have two cameras in the main scene
+	var camera, avatarCam, leftCam, rightCam;  // we have two cameras in the main scene
 	var avatar;
 	// here are some mesh objects ...
 	var intensity = 10;
@@ -98,6 +98,8 @@ The user moves a cube around the board trying to knock balls into a cone
 			camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 1000 );
 			camera.position.set(0,50,0);
 			camera.lookAt(0,0,0);
+
+
 
 			// create the ground and the skybox
 			var ground = createGround('grass.png');
@@ -424,7 +426,6 @@ The user moves a cube around the board trying to knock balls into a cone
       case " ": controls.fly 		= true; break;
       case "h": controls.reset 	= true; break;
 
-
 			// switch cameras
 			case "1": gameState.camera = camera; 		break;
 			case "2": gameState.camera = avatarCam; break;
@@ -434,7 +435,8 @@ The user moves a cube around the board trying to knock balls into a cone
 			case "ArrowRight"	: 	avatarCam.translateY(-1);	break;
 			case "ArrowUp"		: 	avatarCam.translateZ(-1);	break;
 			case "ArrowDown"	: 	avatarCam.translateZ(1);	break;
-
+			case "q": avatarCama.translateX(-1) break;
+			case "e": avatarCama.translateX(1) break;
 		}
 
 	}
