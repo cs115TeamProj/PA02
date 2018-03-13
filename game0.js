@@ -70,40 +70,7 @@ The user moves a cube around the board trying to knock balls into a cone
 			createMainScene();
 	}
 
-	function initSuzanne(){
-		var loader = new THREE.JSONLoader();
-		loader.load("../models/suzanne.json",
-					function ( geometry, materials ) {
-						console.log("loading suzanne");
-						var material = //materials[ 0 ];
-						new THREE.MeshLambertMaterial( { color: 0x00ff00 } );
-						suzanne = new THREE.Mesh( geometry, material );
-						var suzy2 = suzanne.clone(false);
-						console.log("created suzanne mesh");
-						console.log(JSON.stringify(suzanne.scale));// = new THREE.Vector3(4.0,1.0,1.0);
-						scene.add( suzanne  );
-						var s = 0.5;
-						suzanne.scale.y=s;
-						suzanne.scale.x=s;
-						suzanne.scale.z=s;
-						suzanne.position.z = -5;
-						suzanne.position.y = 3;
-						suzanne.position.x = -5;
-						suzanne.castShadow = true;
 
-
-						suzy2.position.x = 1;
-						suzy2.position.y = 2;
-						scene.add(suzy2);
-						suzy2.castShadow = true;
-
-						//
-					},
-					function(xhr){
-						console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );},
-					function(err){console.log("error in loading: "+err);}
-				)
-	}
 	function createMainScene(){
       // setup lighting
 			var light1 = createPointLight();
@@ -125,11 +92,8 @@ The user moves a cube around the board trying to knock balls into a cone
 
 			// create the avatar
 			avatarCam = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 1000 );
-			avatar = createAvatar();
-			avatar.translateY(20);
-			avatarCam.translateY(-4);
-			avatarCam.translateZ(3);
-			scene.add(avatar);
+			createAvatar();
+
 			gameState.camera = avatarCam;
 
 			addBalls();
@@ -311,21 +275,37 @@ The user moves a cube around the board trying to knock balls into a cone
 	}
 
 	function createAvatar(){
-		//var geometry = new THREE.SphereGeometry( 4, 20, 20);
-		var geometry = new THREE.BoxGeometry( 5, 5, 6);
-		var material = new THREE.MeshLambertMaterial( { color: 0xffff00} );
-		var pmaterial = new Physijs.createMaterial(material,0.9,0.5);
+			var loader = new THREE.JSONLoader();
+			loader.load("../models/suzanne.json",
+					function ( geometry, materials ) {
+
+						var material = new THREE.MeshLambertMaterial( { color: 0xffff00} );
+						var pmaterial = new Physijs.createMaterial(material,0.9,0.5);
+						var mesh = new Physijs.BoxMesh( geometry, pmaterial );
+						mesh.setDamping(0.1,0.1);
+						mesh.castShadow = true;
+						avatar = mesh;
+
+						avatarCam.position.set(0,4,0);
+						avatarCam.lookAt(0,4,10);
+						mesh.add(avatarCam);
+
+						avatar.translateY(20);
+						avatarCam.translateY(-4);
+						avatarCam.translateZ(3);
+						scene.add(avatar);
+					},
+					function(xhr){
+						console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );},
+					function(err){console.log("error in loading: "+err);}
+				)
+
+
 		//var mesh = new THREE.Mesh( geometry, material );
-		var mesh = new Physijs.BoxMesh( geometry, pmaterial );
-		mesh.setDamping(0.1,0.1);
-		mesh.castShadow = true;
 
-		avatarCam.position.set(0,4,0);
-		avatarCam.lookAt(0,4,10);
-		mesh.add(avatarCam);
 
-		return mesh;
 	}
+
 
 
 	function createConeMesh(r,h){
