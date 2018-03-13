@@ -120,7 +120,20 @@ The user moves a cube around the board trying to knock balls into a cone
 			npc = createBoxMesh(0x0000ff,1,2,4);
 			npc.position.set(30,3,-30);
 			scene.add(npc);
+			npc.addEventListener( 'collision',
+				function( other_object, relative_velocity, relative_rotation, contact_normal ) {
+					if (other_object==avatar){
+						console.log("npc hit the avatar");
+						soundEffect('loseClank.wav');
+						gameState.health -= 1;  //reduce health
+						if (gameState.health==0) {
+							gameState.scene='youlose';
+						}
 
+
+					}
+				}
+			)
 			//playGameMusic();
 
 	}
@@ -301,7 +314,7 @@ The user moves a cube around the board trying to knock balls into a cone
 						mesh.castShadow = true;
 						avatar = mesh;
 
-						avatarCam.position.set(0,4,0);
+						avatarCam.position.set(0,4.5,4);
 						avatarCam.lookAt(0,4,10);
 						mesh.add(avatarCam);
 
@@ -444,8 +457,11 @@ The user moves a cube around the board trying to knock balls into a cone
 			npc.lookAt(avatar.position);
 
 			var distance = npc.position.distanceTo(avatar.position)
-			if(distance <= 15){
+			if(distance <= 15 && distance > 2){
 				controls.npcFwd = true;
+			}
+			if (distance <= 2){
+				controls.npcFwd = false;
 			}
 			if (controls.npcFwd){
 				// npc.__dirtyPosition = true;
