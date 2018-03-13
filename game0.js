@@ -129,8 +129,10 @@ The user moves a cube around the board trying to knock balls into a cone
 						if (gameState.health==0) {
 							gameState.scene='youlose';
 						}
-
-
+						// make the ball drop below the scene ..
+						// threejs doesn't let us remove it from the schene...
+						this.position.x = this.position.x - randN(100);
+						this.__dirtyPosition = true;
 					}
 				}
 			)
