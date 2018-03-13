@@ -12,6 +12,7 @@ The user moves a cube around the board trying to knock balls into a cone
 	var camera, avatarCam;  // we have two cameras in the main scene
 	var avatar;
 	// here are some mesh objects ...
+	var intensity = 10;
 
 	var cone;
 	var npc;
@@ -299,7 +300,12 @@ The user moves a cube around the board trying to knock balls into a cone
 						console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );},
 					function(err){console.log("error in loading: "+err);}
 				)
-
+				var currIntensity=(intensity/2)-(gameState.health/2);
+				var c1 = 0xff0040;
+				var distance = 100;
+				var decay = 2.0;
+				light1 = new THREE.PointLight( c1, currIntensity, distance, decay );
+				scene.add( light1 );
 
 		//var mesh = new THREE.Mesh( geometry, material );
 
