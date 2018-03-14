@@ -16,17 +16,23 @@ The user moves a cube around the board trying to knock balls into a cone
 
 	var cone;
 	var npc;
-
+	var playing = false;
 	var endScene, loseScene, startScene, endCamera, loseCamera, startCamera, endText, startText;
 
 	var controls =
 	     {fwd:false, bwd:false, left:false, right:false,
 				speed:10, fly:false, reset:false, npcSpeed:5, npcFwd:false,
+				fireballSpeed:7, fireBallFwd: false,
 		    camera:camera}
 
 	var gameState =
 	     {score:0, health:10, scene:'start', camera:'none' }
 
+	 var button = document.createElement("button");
+		var insideText = document.createTextNode("reset")
+		button.appendChild(insideText);
+		var body = document.getElementsByTagName("body")[0];
+		document.body.appendChild(button);
 
 	// Here is the main game control
   init(); //
@@ -155,7 +161,7 @@ The user moves a cube around the board trying to knock balls into a cone
 
 
 		for(i=0;i<numBalls;i++){
-			var ball = createBall();
+			var ball = createBall(1, 16, 16);
 			ball.position.set(randN(20)+15,30,randN(20)+15);
 			scene.add(ball);
 
@@ -176,6 +182,32 @@ The user moves a cube around the board trying to knock balls into a cone
 				}
 			)
 		}
+	}
+
+	function addAttackBalls(){
+			var fireball = createBall(.25, .8, .8);
+
+			fireball.position.set(Math.floor(npc.position.x), Math.floor(npc.position.y), Math.floor(npc.position.z));
+			scene.add(fireball);
+			fireball.lookAt(avatar.position);
+			fireball.setLinearVelocity(fireball.getWorldDirection().multiplyScalar(controls.fireballSpeed));
+
+			fireball.addEventListener( 'collision',
+				function( other_object, relative_velocity, relative_rotation, contact_normal ) {
+					if (other_object==cone){
+						console.log("fireball touched monkey");
+						soundEffect('loseClank.wav');
+						gameState.health -= 1;  // add one to the score
+						if (gameState.health==0) {
+							gameState.scene='youlose';
+						}
+						// make the ball drop below the scene ..
+						// threejs doesn't let us remove it from the schene...
+						this.position.y = this.position.y - 100;
+						this.__dirtyPosition = true;
+				}
+			}
+		)
 	}
 
 
@@ -359,9 +391,8 @@ The user moves a cube around the board trying to knock balls into a cone
 	}
 
 
-	function createBall(){
-		//var geometry = new THREE.SphereGeometry( 4, 20, 20);
-		var geometry = new THREE.SphereGeometry( 1, 16, 16);
+	function createBall(radius, width, height){
+		var geometry = new THREE.SphereGeometry( radius, width, height);
 		var material = new THREE.MeshLambertMaterial( { color: 0xffff00} );
 		var pmaterial = new Physijs.createMaterial(material,0.9,0.5);
     var mesh = new Physijs.BoxMesh( geometry, material );
@@ -435,8 +466,8 @@ The user moves a cube around the board trying to knock balls into a cone
 			case "ArrowRight"	: 	avatarCam.translateY(-1);	break;
 			case "ArrowUp"		: 	avatarCam.translateZ(-1);	break;
 			case "ArrowDown"	: 	avatarCam.translateZ(1);	break;
-			case "q"					: 	avatarCam.rotateY(Math.PI/4);break;
-			case "e"					: 	avatarCam.rotateY(-Math.PI/4); break;
+			case "q"					: 	avatarCam.rotateY(.05);break;
+			case "e"					: 	avatarCam.rotateY(-.05); break;
 		}
 
 	}
@@ -459,9 +490,11 @@ The user moves a cube around the board trying to knock balls into a cone
 
 	function updateNPC(){
 			npc.lookAt(avatar.position);
+			var time = new Date().getTime() / 100;
+			var distance = npc.position.distanceTo(avatar.position);
 
-			var distance = npc.position.distanceTo(avatar.position)
-			if(distance <= 15 && distance > 2){
+			if(distance <= 25 && distance > 5){
+				//console.log("the x position is " + npc.position.x);
 				controls.npcFwd = true;
 			}
 			if (distance <= 2){
@@ -470,6 +503,16 @@ The user moves a cube around the board trying to knock balls into a cone
 			if (controls.npcFwd){
 				// npc.__dirtyPosition = true;
 				npc.setLinearVelocity(npc.getWorldDirection().multiplyScalar(controls.npcSpeed));
+				if((Math.floor(time) + Math.floor(distance)) / 8 % 3 == 0){
+					addAttackBalls();
+					/*
+					var fireball = createBall(.25, 1, 1);
+					fireball.position.set(Math.floor(npc.position.x), Math.floor(npc.position.y), Math.floor(npc.position.z));
+					scene.add(fireball);
+					fireball.lookAt(avatar.position);
+					fireball.setLinearVelocity(fireball.getWorldDirection().multiplyScalar(controls.fireballSpeed));
+					*/
+				}
 			}
 		}
 
