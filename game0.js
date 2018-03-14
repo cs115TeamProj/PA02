@@ -141,6 +141,7 @@ The user moves a cube around the board trying to knock balls into a cone
 						// threejs doesn't let us remove it from the schene...
 						this.position.x = this.position.x - randN(100);
 						this.__dirtyPosition = true;
+						contronpcFwd = false;
 					}
 				}
 			)
@@ -185,8 +186,7 @@ The user moves a cube around the board trying to knock balls into a cone
 	}
 
 	function addAttackBalls(){
-			var fireball = createBall(.25, .8, .8);
-
+			var fireball = createBall(.1, .8, .8);
 			fireball.position.set(Math.floor(npc.position.x), Math.floor(npc.position.y), Math.floor(npc.position.z));
 			scene.add(fireball);
 			fireball.lookAt(avatar.position);
@@ -194,7 +194,7 @@ The user moves a cube around the board trying to knock balls into a cone
 
 			fireball.addEventListener( 'collision',
 				function( other_object, relative_velocity, relative_rotation, contact_normal ) {
-					if (other_object==cone){
+					if (other_object==avatar){
 						console.log("fireball touched monkey");
 						soundEffect('loseClank.wav');
 						gameState.health -= 1;  // add one to the score
