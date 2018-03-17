@@ -519,7 +519,18 @@ The user moves a cube around the board trying to knock balls into a cone
 
   function updateAvatar(){
 		"change the avatar's linear or angular velocity based on controls state (set by WSAD key presses)"
-
+		switch(gameState.health){
+			case 10	:  avatar.material.color.setHex(0xffff00); break;
+			case 9	:  avatar.material.color.setHex(0xccff33); break;
+			case 8	:  avatar.material.color.setHex(0x99ff33); break;
+			case 7	:  avatar.material.color.setHex(0x66ff33); break;
+			case 6	:  avatar.material.color.setHex(0x33cc33); break;
+			case 5	:  avatar.material.color.setHex(0x00cc00); break;
+			case 4	:  avatar.material.color.setHex(0x009933); break;
+			case 3	:  avatar.material.color.setHex(0x006600); break;
+			case 2	:  avatar.material.color.setHex(0x003300); break;
+			case 1	:  avatar.material.color.setHex(0x003300); break;
+		}
 		var forward = avatar.getWorldDirection();
 
 		if (controls.fwd){
