@@ -28,11 +28,6 @@ var light_l;
 	var gameState =
 	     {score:0, health:10, scene:'start', camera:'none' }
 
-	 var button = document.createElement("button");
-		var insideText = document.createTextNode("reset")
-		button.appendChild(insideText);
-		var body = document.getElementsByTagName("body")[0];
-		document.body.appendChild(button);
 
 	// Here is the main game control
   init(); //
@@ -436,10 +431,7 @@ var light_l;
 
 		if(gameState.scene=='youlose') {
 			if(event.key=='r') {
-				gameState.health=10;
-				gameState.score = 0;
-				gameState.scene = 'main';
-				addBalls();
+				location.reload();
 				return;
 			}
 
@@ -555,8 +547,7 @@ var light_l;
 		}
 
     if (controls.reset){
-      avatar.__dirtyPosition = true;
-      avatar.position.set(40,10,40);
+      location.reload();
     }
 
 
@@ -587,13 +578,10 @@ var light_l;
 				if (gameState.camera!= 'none'){
 					renderer.render( scene, gameState.camera );
 				}
-				// if (gameState.health == 0){
-				// 	gameState.scene = 'youlose';
-				// }
 				break;
 
 		case "youlose":
-		console.log("losing")
+		console.log("losing");
 			loseText.rotateY(0.005);
 			renderer.render(loseScene, loseCamera );
 			break;
