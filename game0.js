@@ -1,4 +1,3 @@
-
 /*
 Game 0
 This is a ThreeJS program which implements a simple game
@@ -21,7 +20,7 @@ var light_l;
 
 	var controls =
 	     {fwd:false, bwd:false, left:false, right:false,
-				speed:10, fly:false, reset:false, npcSpeed:5, npcFwd:false,
+				speed:10, fly:false, reset:false, npcSpeed:5, npcSpeedFast: 10, npcFwd:false,
 				fireballSpeed:7, fireBallFwd: false,
 		    camera:camera}
 
@@ -419,6 +418,14 @@ var light_l;
 			addBalls();
 			return;
 		}
+
+		if (gameState.scene == 'start' && event.key=='h') {
+			gameState.scene = 'hardLevel';
+			gameState.health = 5;
+			gameState.score = 0;
+			addBalls();
+			return;
+		}
 		//console.dir(event);
 		// first we handle the "play again" key in the "youwon" scene
 		if (gameState.scene == 'youwon' && event.key=='r') {
@@ -508,6 +515,34 @@ var light_l;
 				}
 			}
 		}
+		function updateNPCHard(){
+				npc.lookAt(avatar.position);
+				var time = new Date().getTime() / 100;
+				var distance = npc.position.distanceTo(avatar.position);
+
+				if(distance <= 40 && distance > 5){ //starts approaching when in a 40 meter distance
+					//console.log("the x position is " + npc.position.x);
+					controls.npcFwd = true;
+				}
+				if (distance <= 2){
+					controls.npcFwd = false;
+				}
+				if (controls.npcFwd){
+					// npc.__dirtyPosition = true;
+					npc.setLinearVelocity(npc.getWorldDirection().multiplyScalar(controls.npcSpeedFast));
+					if((Math.floor(time) + Math.floor(distance)) / 8 % 3 == 0){
+						addAttackBalls();
+						/*
+						var fireball = createBall(.25, 1, 1);
+						fireball.position.set(Math.floor(npc.position.x), Math.floor(npc.position.y), Math.floor(npc.position.z));
+						scene.add(fireball);
+						fireball.lookAt(avatar.position);
+						fireball.setLinearVelocity(fireball.getWorldDirection().multiplyScalar(controls.fireballSpeed));
+						*/
+					}
+				}
+			}
+
 
 
   function updateAvatar(){
@@ -579,6 +614,14 @@ var light_l;
 					renderer.render( scene, gameState.camera );
 				}
 				break;
+				case "hardLevel":
+					updateAvatar();
+					updateNPCHard();
+		    	scene.simulate();
+					if (gameState.camera!= 'none'){
+						renderer.render( scene, gameState.camera );
+					}
+					break;
 
 		case "youlose":
 		console.log("losing");
@@ -594,5 +637,5 @@ var light_l;
 
 		//draw heads up display ..
 	  var info = document.getElementById("info");
-		info.innerHTML='<div style="font-size:24pt">Score: ' + gameState.score + ' Health: ' + gameState.health + '</div>';
+		info.innerHTML='<div style="font-size:24pt">Score: ' + gameState.score + ' Health: ' + gameState.health + ' Push H for Hard level and P for Easy</div>';
 	}
