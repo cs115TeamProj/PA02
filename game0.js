@@ -12,9 +12,10 @@ The user moves a cube around the board trying to knock balls into a cone
 	var avatar;
 	// here are some mesh objects ...
 	var intensity = 10;
-var light_l;
+	var light_l;
 	var cone;
 	var npc;
+	var npc2;
 	var playing = false;
 	var endScene, loseScene, startScene, endCamera, loseCamera, startCamera, endText, startText;
 
@@ -71,7 +72,8 @@ var light_l;
 		loseCamera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 0.1, 1000 );
 		loseCamera.position.set(0,50,1);
 		loseCamera.lookAt(0,0,0);
-	}
+	} 
+
 
 	/**
 	  To initialize the scene, we initialize each of its components
@@ -122,6 +124,11 @@ var light_l;
 			npc = createBoxMesh(0x0000ff,1,2,4);
 			npc.position.set(30,3,-30);
 			scene.add(npc);
+			
+			npc2=createBoxMesh(0x00ff00,1,2,4);
+			npc2.position.set(-20,3,-30);
+			scene.add(npc2);
+			
 			npc.addEventListener( 'collision',
 				function( other_object, relative_velocity, relative_rotation, contact_normal ) {
 					if (other_object==avatar){
@@ -131,6 +138,7 @@ var light_l;
 						if (gameState.health==0) {
 							gameState.scene='youlose';
 						}
+						
 						var currIntensity=2;
 						var c1 = 0xff0040;
 						var distance = 100;
@@ -146,7 +154,32 @@ var light_l;
 					}
 				}
 			)
-			//playGameMusic();
+			
+				npc2.addEventListener( 'collision',
+					function( other_object, relative_velocity, relative_rotation, contact_normal ) {
+						if (other_object==avatar){
+							console.log("npc2 hit the avatar");
+							//soundEffect('loseClank.wav');
+							gameState.health += 1;  //increase health
+							if (gameState.health==0) {
+								gameState.scene='youlose';
+							}
+							
+						var currIntensity2=1;
+						var c2 = 0xff0040;
+						var distance2 = 100;
+						var decay2 = 2.0;
+						light_l = new THREE.PointLight( c1, currIntensity, distance, decay );
+						scene.add(light_l);
+
+						// make the ball drop below the scene ..
+						// threejs doesn't let us remove it from the schene...
+						this.position.x = this.position.x - randN(100);
+						this.__dirtyPosition = true;
+						contronpcFwd = false;
+					}
+				}
+			)
 
 	}
 
@@ -428,7 +461,7 @@ var light_l;
 		}
 		//console.dir(event);
 		// first we handle the "play again" key in the "youwon" scene
-		if (gameState.scene == 'youwon' && event.key=='r') {
+		if (gameState.scene == 'youwin' && event.key=='r') {
 			gameState.scene = 'main';
 			gameState.score = 0;
 			addBalls();
@@ -455,7 +488,8 @@ var light_l;
 			case "f": controls.down		= true; break;
 			case "m": controls.speed 	= 30; 	break;
       case " ": controls.fly 		= true; break;
-      case "h": controls.reset 	= true; break;
+      case "h": controls.reset 	= true; break; 
+      case "t": controls.reset = true;break; 
 
 			// switch cameras
 			case "1": gameState.camera = camera; 		break;
@@ -484,7 +518,8 @@ var light_l;
 			case "f": controls.down  = false; break;
 			case "m": controls.speed = 10; 		break;
       case " ": controls.fly 	 = false; break;
-      case "h": controls.reset = false; break;
+      case "h": controls.reset = false; break; 
+      case "t": controls.reset=false; break;
 		}
 	}
 
@@ -542,7 +577,33 @@ var light_l;
 					}
 				}
 			}
+	function addNPC(){	
+		npc2.lookAt(avatar.position);
+			var time = new Date().getTime() / 100;
+			var distance = npc2.position.distanceTo(avatar.position);
 
+			if(distance <= 25 && distance > 5){
+				//console.log("the x position is " + npc.position.x);
+				controls.npcFwd = true;
+			}
+			if (distance <= 2){
+				controls.npcFwd = false;
+			}
+			if (controls.npcFwd){
+				// npc.__dirtyPosition = true;
+				npc.setLinearVelocity(npc.getWorldDirection().multiplyScalar(controls.npcSpeed));
+				if((Math.floor(time) + Math.floor(distance)) / 8 % 3 == 0){
+					addAttackBalls();
+					/*
+					var fireball = createBall(.25, 1, 1);
+					fireball.position.set(Math.floor(npc.position.x), Math.floor(npc.position.y), Math.floor(npc.position.z));
+					scene.add(fireball);
+					fireball.lookAt(avatar.position);
+					fireball.setLinearVelocity(fireball.getWorldDirection().multiplyScalar(controls.fireballSpeed));
+					*/
+				}
+			}
+	}
 
 
   function updateAvatar(){
@@ -596,12 +657,15 @@ var light_l;
 
 		switch(gameState.scene) {
 
-			case "youwon":
-				endText.rotateY(0.005);
-				renderer.render( endScene, endCamera );
-				break;
 			case "start":
-				console.log("starta")
+				console.log("start")
+				loseText.rotateY(0.005);
+				console.log(startScene)
+				renderer.render(startScene, startCamera );
+				break;
+			
+			case "restart": 
+				console.log("restart")
 				loseText.rotateY(0.005);
 				console.log(startScene)
 				renderer.render(startScene, startCamera );
@@ -609,6 +673,7 @@ var light_l;
 			case "main":
 				updateAvatar();
 				updateNPC();
+				addNPC();
 	    	scene.simulate();
 				if (gameState.camera!= 'none'){
 					renderer.render( scene, gameState.camera );
@@ -617,17 +682,20 @@ var light_l;
 				case "hardLevel":
 					updateAvatar();
 					updateNPCHard();
+					addNPC();
 		    	scene.simulate();
 					if (gameState.camera!= 'none'){
 						renderer.render( scene, gameState.camera );
 					}
 					break;
 
+
 		case "youlose":
 		console.log("losing");
 			loseText.rotateY(0.005);
 			renderer.render(loseScene, loseCamera );
 			break;
+
 
 
 			default:
@@ -637,5 +705,5 @@ var light_l;
 
 		//draw heads up display ..
 	  var info = document.getElementById("info");
-		info.innerHTML='<div style="font-size:24pt">Score: ' + gameState.score + ' Health: ' + gameState.health + ' Push H for Hard level and P for Easy</div>';
+		info.innerHTML='<div style="font-size:24pt">Score: ' + gameState.score + ' Health: ' + gameState.health + ' Press P for Easy and H for Hard and T to Restart</div>';
 	}
